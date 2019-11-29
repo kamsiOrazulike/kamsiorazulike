@@ -1,0 +1,826 @@
+<!DOCTYPE html>
+<html>
+
+
+<head>
+	<title> Humpty Falls </title>
+  <meta charset="UTF-8">
+<!-- <link rel="stylesheet" href="game.css"> -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+<script src='https://kit.fontawesome.com/a076d05399.js'></script>
+
+<style type="text/css">
+  html {
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  border: 0;
+  overflow: hidden; 
+  display: block;
+}
+
+.bg {
+  /* The image used */
+  background-image: url("humptyDumpty.png");
+
+  /* Full height */
+  height: 100%; 
+
+  /* Center and scale the image nicely */
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: cover;
+     opacity: 0.3;
+}
+
+
+body {
+  font-family: "HelveticaNeue-Light", "Helvetica Neue Light", "Helvetica Neue", Helvetica, Arial, "Lucida Grande", sans-serif; 
+background: #10da00;
+  text-align:center;
+  font-size:18px;
+width: 100%;
+height: 100%;
+  margin: 0;
+  border: 0;
+  position: top;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: block;
+  overflow: hidden;
+  -webkit-font-smoothing: antialiased;
+}
+
+
+
+.wrappper{
+  @include clear;
+  width:100%;
+  margin:0 auto;
+}
+
+#muteButton{
+  position:fixed;
+  color:black;
+  top:10px;
+  left:140px;
+} #muteButton:hover{
+  transform: scale(1.1);
+  color: white;
+}
+
+#playButton{
+  position:fixed;
+  color:black;
+  top:10px;
+  left:70px;
+} #playButton:hover{
+  transform: scale(1.1);
+  color:white;
+}
+
+canvas{
+  position:absolute;
+
+  top:62px;
+  left:10px;
+  border: white dashed 1px;
+  /* padding:200px; */
+}
+
+#backButton{
+  position:fixed;
+  top:10px;
+  left:10px;
+} #backButton:hover{
+  transform: scale(1.1);
+  color:white;
+}
+
+#alphabet {
+  position: absolute;
+  bottom:50px; /* AVOIDED USING em's BECAUSE WORDS DONT NEED TO BE THART LARGE. 1em = 16px*/
+  left:50px;
+  margin:0px;
+  padding:0;
+ /* max-width:100%; */
+}
+
+
+/*Details of keypad*/
+#alphabet li {
+  float:left;
+  margin: 0 20px 10px 0;
+  list-style:none;
+  width:60px;
+  height:60px;
+
+  padding-top:10px;
+  padding-left:10px;
+  background:#6ae860;
+  color: white;
+  cursor:pointer;
+  border: solid 2px black;
+}
+
+#alphabet li:hover {
+  background: #a5f19f;
+  color:black;
+  border: solid 2px white;
+}
+
+#hint{
+position: absolute;
+bottom: 300px;
+right: 170px;
+
+color: black;
+border: solid 1px black;
+text-decoration:black;
+cursor:pointer;
+font-size:20px;
+
+padding:18px 10px;
+width:100px;
+margin: 5px;
+outline: none;
+}
+  
+  #hint:hover{
+ transform: scale(1.1); 
+border: solid 2px black;
+    }
+
+#clue{
+  position: absolute;
+  bottom: 200px;
+  left: 16px;
+  font-size:26px;
+  text-align:center;
+  display:block;
+}
+
+#reset{
+position: absolute;
+bottom: 300px;
+right: 20px;
+
+color: black;
+border: solid 1px black;
+text-decoration:black;
+cursor:pointer;
+font-size:20px;
+
+padding:18px 10px;
+width:120px;
+margin: 5px;
+outline: none;
+}
+  
+  #reset:hover{
+ transform: scale(1.1); 
+border: solid 2px black;
+    }
+
+#my-word {
+  position: absolute;
+  top:300px;
+  right:10px;
+  margin: 0;
+  display: block;
+  padding: 0;
+  display:block;
+}
+
+#my-word li {
+  position: relative;
+  list-style: none;
+  margin: 0;
+  display: inline-block;
+  padding: 0 10px;
+  font-size:1.6em;
+}
+
+.active {
+  @include opacity;
+  cursor:default;
+    
+  &:hover{
+      @include fade;
+      @include opacity;
+    }
+}
+
+
+#myGuess{
+  position: absolute;
+  top: -30px;
+  right: 16px;
+  font-size:40px;
+  text-align:center;
+  display:block;
+}
+
+#catagoryName{
+  position: absolute;
+  top:5em;
+  right:1em;
+
+}
+
+
+@media (max-width: 767px) {
+  #alphabet {
+  padding:0 0 0 15px;
+}
+  }
+
+  @media (max-width: 480px) {
+  #alphabet {
+  padding:0 0 0 25px;
+}
+  }
+</style>
+</head>
+
+
+<body>
+<audio id="humptyMusic" autoplay="" loop>
+<source src="humptyMusic.mp3" type="audio/mpeg">
+</audio>
+
+<div class="bg"></div>
+<i id = "muteButton" class="fas fa-volume-mute" style='font-size:50px' class='far'></i>
+<i id = "playButton" class="fas fa-volume-up" style='font-size:50px' class='far'></i>
+
+<i id = "backButton" style='font-size:50px' class='far'>&#xf359;</i>
+<div class="wrapper">
+<div id="buttons"> 
+<p id="catagoryName"></p>
+
+<div id="hold"></div>
+<b><p id="myGuess"></p></b>
+<b><p id="clue">Hint: </p></b>
+
+<canvas id="humpty" width="800" height="420"> </canvas>
+</div>
+
+<div class="container">
+      <button id="hint">Hint</button>
+      <button id="reset">Play again</button>
+</div>
+
+</div>
+
+<script type="text/javascript">
+  var music = document.getElementById('humptyMusic'); 
+document.getElementById("muteButton").addEventListener("click", clickToMute);
+function clickToMute(){
+    music.muted = true;
+}
+document.getElementById("playButton").addEventListener("click", clickToPlay);
+function clickToPlay(){
+    music.muted = false;
+}
+</script>
+
+<script type="text/javascript">
+document.getElementById("backButton").addEventListener("click",clickToHome);
+function clickToHome(){window.open("title.html", "_self");}
+
+function game () {
+
+  var alphabet = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h',
+        'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's',
+        't', 'u', 'v', 'w', 'x', 'y', 'z'];
+  
+  var categories;         // Array of topics
+  var chosenCategory;     // Selected catagory
+  var getHint ;          // Word getHint
+  var word ;              // Selected word
+  var guess ;             // Geuss
+  var geusses = [ ];      // Stored geusses
+  var lives ;             // Lives
+  var counter ;           // Count correct geusses
+  var space;              // Number of spaces in word '-'
+
+  // Get elements
+  var showLives = document.getElementById("myGuess");
+  var showCatagory = document.getElementById("scatagory");
+  var getHint = document.getElementById("hint");
+  var showClue = document.getElementById("clue");
+
+
+
+  // create alphabet ul
+  var buttons = function () {
+    myButtons = document.getElementById('buttons');
+    letters = document.createElement('ul');
+
+    for (var i = 0; i < alphabet.length; i++) {
+      letters.id = 'alphabet';
+      list = document.createElement('li');
+      list.id = 'letter';
+      list.innerHTML = alphabet[i];
+      check();
+      myButtons.appendChild(letters);
+      letters.appendChild(list);
+    }
+  }
+    
+  
+  // Select Catagory
+  var selectCat = function () {
+    if (chosenCategory === categories[0]) {catagoryName.innerHTML = "The Chosen Category Is Fruits";} 
+      else if (chosenCategory === categories[1]) {catagoryName.innerHTML = "The Chosen Category Is Stationary";} 
+      else if (chosenCategory === categories[2]) {catagoryName.innerHTML = "The Chosen Category Is Pets";}   
+  }
+  
+
+  // Create geusses ul
+   result = function () {
+    wordHolder = document.getElementById('hold');
+    correct = document.createElement('ul');
+
+    for (var i = 0; i < word.length; i++) {
+      correct.setAttribute('id', 'my-word');
+      guess = document.createElement('li');
+      guess.setAttribute('class', 'guess');
+      if (word[i] === "-") {
+        guess.innerHTML = "-";
+        space = 1;
+      } else {
+        guess.innerHTML = "_";
+      }
+
+      geusses.push(guess);
+      wordHolder.appendChild(correct);
+      correct.appendChild(guess);
+    }
+  }
+  
+  // Show lives
+   comments = function () {
+    showLives.innerHTML = "You have " + lives + " guesses left";
+    if (lives < 1) {
+    showLives.innerHTML = "Game Over";
+  setTimeout(function() {location.reload();}, 2000);} //reload page after 10 fails.
+
+    for (var i = 0; i < geusses.length; i++) {
+      if (counter + space === geusses.length) {
+        showLives.innerHTML = "You Win!";
+  //setTimeout(function() {location.reload();}, 3000);} //reload page after WIN
+      }
+    }
+  }
+
+
+  // Animate man
+  var animate = function () {
+    var drawMe = lives ;
+    drawArray[drawMe]();
+  }
+ 
+  // Hangman
+  canvas =  function(){
+    myHumpty = document.getElementById("humpty");
+    context = myHumpty.getContext('2d');
+/*sky*/
+  context.beginPath();
+  context.rect(0, 0, 800, 250);
+  context.fillStyle = "#42a5f5";
+  context.fill();
+/*ground*/
+  context.beginPath();
+  context.rect(0, 250, 800, 250);
+  context.fillStyle = "#458B00";
+  context.fill();
+/*wall*/
+  context.beginPath();
+  context.rect(0, 190, 602, 182);
+  context.fillStyle = "black";
+  context.fill();
+
+  context.beginPath();
+  context.rect(1, 191, 600, 180);
+  context.fillStyle = "#a1a1a1";
+  context.fill();
+  
+/*bricks*/
+
+  for (var i = 0; i < 6; i++){
+    for (var j = 0; j < 6; j++){
+      context.beginPath();
+      context.rect(1+101*i, 1+190+31*j, 95, 25);
+      context.fillStyle = "#dc5539";
+      context.fill();
+    }
+  }
+}
+
+  
+  frame1 = function(){
+/*humpty frame 1*/
+    /*body*/
+var hx = 500;
+var hy = 100;
+
+context.lineWidth="4"; context.strokeStyle = "black"; context.scale(0.85, 1); context.beginPath(); context.arc(hx, hy, 90, 0, 2 * Math.PI); context.fillStyle = "yellow"; context.fill(); context.stroke();
+  /* legs*/
+context.beginPath(); context.moveTo(hx-50, hy+73); context.lineTo(hx-110, hy+100); context.lineTo(hx-60, hy+120); context.stroke();
+context.beginPath(); context.moveTo(hx+50, hy+73); context.lineTo(hx+110, hy+100); context.lineTo(hx+60, hy+120); context.stroke();
+
+context.lineWidth="3"; context.strokeStyle = "black"; context.scale(0.75, 1); context.beginPath(); context.arc(hx+80, hy+132, 15, 0, 2 * Math.PI); context.fillStyle = "yellow"; context.fill(); context.stroke();
+context.lineWidth="3"; context.strokeStyle = "black"; context.scale(1, 1); context.beginPath(); context.arc(hx+255, hy+132, 15, 0, 2 * Math.PI); context.fillStyle = "yellow"; context.fill(); context.stroke();
+  
+  /*eyes*/
+context.lineWidth="2"; context.strokeStyle = "black"; context.scale(1.5, 1); context.beginPath(); context.arc(hx-80, hy-30, 6, 0, 2 * Math.PI); context.fillStyle = "black"; context.fill(); context.stroke();
+context.lineWidth="2"; context.strokeStyle = "white"; context.scale(1, 1); context.beginPath(); context.arc(hx-78, hy-32, 1, 0, 2 * Math.PI); context.fillStyle = "white"; context.fill(); context.stroke();
+
+context.lineWidth="2"; context.strokeStyle = "black"; context.scale(1, 1); context.beginPath(); context.arc(hx-30, hy-30, 6, 0, 2 * Math.PI); context.fillStyle = "black"; context.fill(); context.stroke();
+context.lineWidth="2"; context.strokeStyle = "white"; context.scale(1, 1); context.beginPath(); context.arc(hx-28, hy-32, 1, 0, 2 * Math.PI); context.fillStyle = "white"; context.fill(); context.stroke();
+
+  /*initial smile*/
+context.lineWidth="4"; context.strokeStyle = "black"; context.scale(1.2, 1); context.beginPath(); context.arc(hx-129, hy+20, 30, 0, Math.PI, false); context.fillStyle = "yellow"; context.fill(); context.stroke();
+  }
+
+    
+  draw = function($pathFromx, $pathFromy, $pathTox, $pathToy) {
+    context.moveTo($pathFromx, $pathFromy);
+    context.lineTo($pathTox, $pathToy);
+    context.stroke(); 
+  }
+
+  frame2 = function() {
+/*humpty frame 2*/
+    /*body*/
+var hx = 500;
+var hy = 100;
+
+context.lineWidth="4"; context.strokeStyle = "black"; context.scale(0.85, 1); context.beginPath(); context.arc(hx, hy, 90, 0, 2 * Math.PI); context.fillStyle = "yellow"; context.fill(); context.stroke();
+  /* legs*/
+context.beginPath(); context.moveTo(hx-50, hy+73); context.lineTo(hx-110, hy+100); context.lineTo(hx-60, hy+120); context.stroke();
+context.beginPath(); context.moveTo(hx-50, hy+73); context.lineTo(hx-110, hy+100); context.lineTo(hx-60, hy+120); context.stroke();
+context.beginPath(); context.moveTo(hx-50, hy+73); context.lineTo(hx-110, hy+100); context.lineTo(hx-60, hy+120); context.stroke();
+context.beginPath(); context.moveTo(hx-50, hy+73); context.lineTo(hx-110, hy+100); context.lineTo(hx-60, hy+120); context.stroke();
+context.beginPath(); context.moveTo(hx-50, hy+73); context.lineTo(hx-110, hy+100); context.lineTo(hx-60, hy+120); context.stroke();
+context.beginPath(); context.moveTo(hx-50, hy+73); context.lineTo(hx-110, hy+100); context.lineTo(hx-60, hy+120); context.stroke();
+context.beginPath(); context.moveTo(hx-50, hy+73); context.lineTo(hx-110, hy+100); context.lineTo(hx-60, hy+120); context.stroke();
+context.beginPath(); context.moveTo(hx-50, hy+73); context.lineTo(hx-110, hy+100); context.lineTo(hx-60, hy+120); context.stroke();
+context.beginPath(); context.moveTo(hx-50, hy+73); context.lineTo(hx-110, hy+100); context.lineTo(hx-60, hy+120); context.stroke();
+context.beginPath(); context.moveTo(hx-50, hy+73); context.lineTo(hx-110, hy+100); context.lineTo(hx-60, hy+120); context.stroke();
+context.beginPath(); context.moveTo(hx+50, hy+73); context.lineTo(hx+110, hy+100); context.lineTo(hx+60, hy+120); context.stroke();
+
+context.lineWidth="3"; context.strokeStyle = "black"; context.scale(0.75, 1); context.beginPath(); context.arc(hx+80, hy+132, 15, 0, 2 * Math.PI); context.fillStyle = "yellow"; context.fill(); context.stroke();
+context.lineWidth="3"; context.strokeStyle = "black"; context.scale(1, 1); context.beginPath(); context.arc(hx+255, hy+132, 15, 0, 2 * Math.PI); context.fillStyle = "yellow"; context.fill(); context.stroke();
+  
+  /*eyes*/
+context.lineWidth="2"; context.strokeStyle = "black"; context.scale(1.5, 1); context.beginPath(); context.arc(hx-80, hy-30, 6, 0, 2 * Math.PI); context.fillStyle = "black"; context.fill(); context.stroke();
+context.lineWidth="2"; context.strokeStyle = "white"; context.scale(1, 1); context.beginPath(); context.arc(hx-78, hy-32, 1, 0, 2 * Math.PI); context.fillStyle = "white"; context.fill(); context.stroke();
+
+context.lineWidth="2"; context.strokeStyle = "black"; context.scale(1, 1); context.beginPath(); context.arc(hx-30, hy-30, 6, 0, 2 * Math.PI); context.fillStyle = "black"; context.fill(); context.stroke();
+context.lineWidth="2"; context.strokeStyle = "white"; context.scale(1, 1); context.beginPath(); context.arc(hx-28, hy-32, 1, 0, 2 * Math.PI); context.fillStyle = "white"; context.fill(); context.stroke();
+
+/*mouth*/
+context.lineWidth="4"; context.strokeStyle = "black";
+context.beginPath(); context.moveTo(hx-20, hy+25); context.lineTo(hx-90, hy+25); context.stroke();
+   }
+   
+  frame3 = function() {
+/*humpty frame 3*/
+    /*body*/
+var hx = 550;
+var hy = 20;
+
+context.rotate(10 * Math.PI / 180);
+
+context.lineWidth="4"; context.strokeStyle = "black"; context.scale(0.85, 1); context.beginPath(); context.arc(hx, hy, 90, 0, 2 * Math.PI); context.fillStyle = "yellow"; context.fill(); context.stroke();
+  /* legs*/
+context.beginPath(); context.moveTo(hx-50, hy+73); context.lineTo(hx-110, hy+100); context.lineTo(hx-60, hy+120); context.stroke();
+context.beginPath(); context.moveTo(hx+50, hy+73); context.lineTo(hx+110, hy+100); context.lineTo(hx+60, hy+120); context.stroke();
+
+context.lineWidth="3"; context.strokeStyle = "black"; context.scale(0.75, 1); context.beginPath(); context.arc(hx+100, hy+132, 15, 0, 2 * Math.PI); context.fillStyle = "yellow";context.fill();context.stroke();
+context.lineWidth="3"; context.strokeStyle = "black"; context.scale(1, 1); context.beginPath(); context.arc(hx+265, hy+132, 15, 0, 2 * Math.PI); context.fillStyle = "yellow"; context.fill(); context.stroke();
+  
+  /*eyes*/
+context.lineWidth="2"; context.strokeStyle = "black"; context.scale(1.5, 1); context.beginPath(); context.arc(hx-80, hy-30, 6, 0, 2 * Math.PI); context.fillStyle = "black"; context.fill(); context.stroke();
+context.lineWidth="2"; context.strokeStyle = "white"; context.scale(1, 1); context.beginPath(); context.arc(hx-78, hy-32, 1, 0, 2 * Math.PI); context.fillStyle = "white"; context.fill(); context.stroke();
+
+context.lineWidth="2"; context.strokeStyle = "black"; context.scale(1, 1); context.beginPath(); context.arc(hx-30, hy-30, 6, 0, 2 * Math.PI); context.fillStyle = "black"; context.fill(); context.stroke();
+context.lineWidth="2"; context.strokeStyle = "white"; context.scale(1, 1); context.beginPath(); context.arc(hx-28, hy-32, 1, 0, 2 * Math.PI); context.fillStyle = "white"; context.fill(); context.stroke();
+/*mouth*/
+context.lineWidth="4"; context.strokeStyle = "black";
+context.beginPath(); context.moveTo(hx-20, hy+25); context.lineTo(hx-90, hy+25); context.stroke();
+
+
+context.rotate(-10 * Math.PI / 180);
+   }
+  
+  frame4 = function() {
+/*humpty frame 4*/
+    /*body*/
+var hx = 600;
+var hy = -80;
+context.rotate(20 * Math.PI / 180);
+
+context.lineWidth="4"; context.strokeStyle = "black"; context.scale(0.85, 1); context.beginPath(); context.arc(hx, hy, 90, 0, 2 * Math.PI); context.fillStyle = "yellow"; context.fill(); context.stroke();
+  /* legs*/
+context.beginPath(); context.moveTo(hx-50, hy+73); context.lineTo(hx-110, hy+100); context.lineTo(hx-90, hy+135); context.stroke();
+context.beginPath(); context.moveTo(hx+50, hy+73); context.lineTo(hx+110, hy+100); context.lineTo(hx+60, hy+120); context.stroke();
+
+context.lineWidth="3"; context.strokeStyle = "black"; context.scale(0.75, 1); context.beginPath(); context.arc(hx+80, hy+142, 15, 0, 2 * Math.PI); context.fillStyle = "yellow";context.fill();context.stroke();
+context.lineWidth="3"; context.strokeStyle = "black"; context.scale(1, 1); context.beginPath(); context.arc(hx+285, hy+132, 15, 0, 2 * Math.PI); context.fillStyle = "yellow"; context.fill(); context.stroke();
+  
+  /*eyes*/
+context.lineWidth="2"; context.strokeStyle = "black"; context.scale(1.5, 1); context.beginPath(); context.arc(hx-80, hy-30, 6, 0, 2 * Math.PI); context.fillStyle = "black"; context.fill(); context.stroke();
+context.lineWidth="2"; context.strokeStyle = "white"; context.scale(1, 1); context.beginPath(); context.arc(hx-78, hy-32, 1, 0, 2 * Math.PI); context.fillStyle = "white"; context.fill(); context.stroke();
+
+context.lineWidth="2"; context.strokeStyle = "black"; context.scale(1, 1); context.beginPath(); context.arc(hx-30, hy-30, 6, 0, 2 * Math.PI); context.fillStyle = "black"; context.fill(); context.stroke();
+context.lineWidth="2"; context.strokeStyle = "white"; context.scale(1, 1); context.beginPath(); context.arc(hx-28, hy-32, 1, 0, 2 * Math.PI); context.fillStyle = "white"; context.fill(); context.stroke();
+
+ /*mouth*/
+context.lineWidth="4"; context.strokeStyle = "black";
+context.beginPath(); context.moveTo(hx-30, hy+25); context.lineTo(hx-80, hy+25); context.stroke();
+  
+context.rotate(-20 * Math.PI / 180);
+   }
+  
+  frame5 = function() {
+/*humpty frame 5*/
+    /*body*/
+
+var hx = 610;
+var hy = -180;
+
+context.rotate(30 * Math.PI / 180);
+
+context.lineWidth="4"; context.strokeStyle = "black"; context.scale(0.85, 1); context.beginPath(); context.arc(hx, hy, 90, 0, 2 * Math.PI); context.fillStyle = "yellow"; context.fill(); context.stroke();
+  /* legs*/
+context.beginPath(); context.moveTo(hx-50, hy+73); context.lineTo(hx-110, hy+100); context.lineTo(hx-90, hy+135); context.stroke();
+context.beginPath(); context.moveTo(hx+50, hy+73); context.lineTo(hx+110, hy+100); context.lineTo(hx+60, hy+120); context.stroke();
+
+context.lineWidth="3"; context.strokeStyle = "black"; context.scale(0.75, 1); context.beginPath(); context.arc(hx+80, hy+142, 15, 0, 2 * Math.PI); context.fillStyle = "yellow";context.fill();context.stroke();
+context.lineWidth="3"; context.strokeStyle = "black"; context.scale(1, 1); context.beginPath(); context.arc(hx+285, hy+132, 15, 0, 2 * Math.PI); context.fillStyle = "yellow"; context.fill(); context.stroke();
+  
+  /*eyes*/
+context.lineWidth="2"; context.strokeStyle = "black"; context.scale(1.5, 1); context.beginPath(); context.arc(hx-80, hy-30, 6, 0, 2 * Math.PI); context.fillStyle = "black"; context.fill(); context.stroke();
+context.lineWidth="2"; context.strokeStyle = "white"; context.scale(1, 1); context.beginPath(); context.arc(hx-78, hy-32, 1, 0, 2 * Math.PI); context.fillStyle = "white"; context.fill(); context.stroke();
+
+context.lineWidth="2"; context.strokeStyle = "black"; context.scale(1, 1); context.beginPath(); context.arc(hx-30, hy-30, 6, 0, 2 * Math.PI); context.fillStyle = "black"; context.fill(); context.stroke();
+context.lineWidth="2"; context.strokeStyle = "white"; context.scale(1, 1); context.beginPath(); context.arc(hx-28, hy-32, 1, 0, 2 * Math.PI); context.fillStyle = "white"; context.fill(); context.stroke();
+
+ /*mouth*/
+context.lineWidth="4"; context.strokeStyle = "black";
+context.beginPath(); context.moveTo(hx-30, hy+25); context.lineTo(hx-80, hy+25); context.stroke();
+  
+
+context.rotate(-30 * Math.PI / 180);
+
+   }
+  
+  frame6 = function() {
+/*humpty frame 6*/
+    /*body*/
+
+var hx = 585;
+var hy = -280;
+
+context.rotate(40 * Math.PI / 180);
+
+context.lineWidth="4"; context.strokeStyle = "black"; context.scale(0.85, 1); context.beginPath(); context.arc(hx, hy, 90, 0, 2 * Math.PI); context.fillStyle = "yellow"; context.fill(); context.stroke();
+  /* legs*/
+context.beginPath(); context.moveTo(hx-50, hy+73); context.lineTo(hx-110, hy+100); context.lineTo(hx-95, hy+135); context.stroke();
+context.beginPath(); context.moveTo(hx+50, hy+73); context.lineTo(hx+110, hy+100); context.lineTo(hx+60, hy+120); context.stroke();
+
+context.lineWidth="3"; context.strokeStyle = "black"; context.scale(0.75, 1); context.beginPath(); context.arc(hx+65, hy+145, 15, 0, 2 * Math.PI); context.fillStyle = "yellow";context.fill();context.stroke();
+context.lineWidth="3"; context.strokeStyle = "black"; context.scale(1, 1); context.beginPath(); context.arc(hx+280, hy+132, 15, 0, 2 * Math.PI); context.fillStyle = "yellow"; context.fill(); context.stroke();
+  
+  /*eyes*/
+context.lineWidth="2"; context.strokeStyle = "black"; context.scale(1.5, 1); context.beginPath(); context.arc(hx-80, hy-30, 6, 0, 2 * Math.PI); context.fillStyle = "black"; context.fill(); context.stroke();
+context.lineWidth="2"; context.strokeStyle = "white"; context.scale(1, 1); context.beginPath(); context.arc(hx-78, hy-32, 1, 0, 2 * Math.PI); context.fillStyle = "white"; context.fill(); context.stroke();
+
+context.lineWidth="2"; context.strokeStyle = "black"; context.scale(1, 1); context.beginPath(); context.arc(hx-30, hy-30, 6, 0, 2 * Math.PI); context.fillStyle = "black"; context.fill(); context.stroke();
+context.lineWidth="2"; context.strokeStyle = "white"; context.scale(1, 1); context.beginPath(); context.arc(hx-28, hy-32, 1, 0, 2 * Math.PI); context.fillStyle = "white"; context.fill(); context.stroke();
+/*mouth*/
+context.lineWidth="4"; context.strokeStyle = "black";
+context.beginPath(); context.moveTo(hx-35, hy+25); context.lineTo(hx-70, hy+25); context.stroke();
+ context.rotate(-40 * Math.PI / 180);
+
+   }
+  
+  frame7 = function() {
+/*humpty frame 7*/
+    /*body*/
+
+var hx = 520;
+var hy = -360;
+
+context.rotate(50 * Math.PI / 180);
+
+context.lineWidth="4"; context.strokeStyle = "black"; context.scale(0.85, 1); context.beginPath(); context.arc(hx, hy, 90, 0, 2 * Math.PI); context.fillStyle = "yellow"; context.fill(); context.stroke();
+  /* legs*/
+context.beginPath(); context.moveTo(hx-50, hy+73); context.lineTo(hx-110, hy+100); context.lineTo(hx-95, hy+135); context.stroke();
+context.beginPath(); context.moveTo(hx+50, hy+73); context.lineTo(hx+110, hy+100); context.lineTo(hx+80, hy+120); context.stroke();
+
+context.lineWidth="3"; context.strokeStyle = "black"; context.scale(0.75, 1); context.beginPath(); context.arc(hx+45, hy+145, 15, 0, 2 * Math.PI); context.fillStyle = "yellow";context.fill();context.stroke();
+context.lineWidth="3"; context.strokeStyle = "black"; context.scale(1, 1); context.beginPath(); context.arc(hx+280, hy+132, 15, 0, 2 * Math.PI); context.fillStyle = "yellow"; context.fill(); context.stroke();
+  
+  /*eyes*/
+context.lineWidth="2"; context.strokeStyle = "black"; context.scale(1.5, 1); context.beginPath(); context.arc(hx-80, hy-30, 6, 0, 2 * Math.PI); context.fillStyle = "black"; context.fill(); context.stroke();
+context.lineWidth="2"; context.strokeStyle = "white"; context.scale(1, 1); context.beginPath(); context.arc(hx-78, hy-32, 1, 0, 2 * Math.PI); context.fillStyle = "white"; context.fill(); context.stroke();
+
+context.lineWidth="2"; context.strokeStyle = "black"; context.scale(1, 1); context.beginPath(); context.arc(hx-30, hy-30, 6, 0, 2 * Math.PI); context.fillStyle = "black"; context.fill(); context.stroke();
+context.lineWidth="2"; context.strokeStyle = "white"; context.scale(1, 1); context.beginPath(); context.arc(hx-28, hy-32, 1, 0, 2 * Math.PI); context.fillStyle = "white"; context.fill(); context.stroke();
+ /*mouth*/
+context.lineWidth="4"; context.strokeStyle = "black";
+context.beginPath(); context.moveTo(hx-35, hy+25); context.lineTo(hx-70, hy+25); context.stroke();
+context.rotate(-50 * Math.PI / 180);
+   }
+  
+  frame8 = function() {
+/*humpty frame 8*/
+    /*body*/
+
+var hx = 450;
+var hy = -445;
+
+context.rotate(60 * Math.PI / 180);
+
+context.lineWidth="4"; context.strokeStyle = "black"; context.scale(0.85, 1); context.beginPath(); context.arc(hx, hy, 90, 0, 2 * Math.PI); context.fillStyle = "yellow"; context.fill(); context.stroke();
+  /* legs*/
+context.beginPath(); context.moveTo(hx-50, hy+73); context.lineTo(hx-110, hy+100); context.lineTo(hx-110, hy+135); context.stroke();
+context.beginPath(); context.moveTo(hx+50, hy+73); context.lineTo(hx+100, hy+120); context.lineTo(hx+75, hy+150); context.stroke();
+
+context.lineWidth="3"; context.strokeStyle = "black"; context.scale(0.75, 1); context.beginPath(); context.arc(hx-10, hy+145, 15, 0, 2 * Math.PI); context.fillStyle = "yellow";context.fill();context.stroke();
+context.lineWidth="3"; context.strokeStyle = "black"; context.scale(1, 1); context.beginPath(); context.arc(hx+240, hy+162, 15, 0, 2 * Math.PI); context.fillStyle = "yellow"; context.fill(); context.stroke();
+  
+  /*eyes*/
+context.lineWidth="2"; context.strokeStyle = "black"; context.scale(1.5, 1); context.beginPath(); context.arc(hx-80, hy-30, 6, 0, 2 * Math.PI); context.fillStyle = "black"; context.fill(); context.stroke();
+context.lineWidth="2"; context.strokeStyle = "white"; context.scale(1, 1); context.beginPath(); context.arc(hx-78, hy-32, 1, 0, 2 * Math.PI); context.fillStyle = "white"; context.fill(); context.stroke();
+
+context.lineWidth="2"; context.strokeStyle = "black"; context.scale(1, 1); context.beginPath(); context.arc(hx-30, hy-30, 6, 0, 2 * Math.PI); context.fillStyle = "black"; context.fill(); context.stroke();
+context.lineWidth="2"; context.strokeStyle = "white"; context.scale(1, 1); context.beginPath(); context.arc(hx-28, hy-32, 1, 0, 2 * Math.PI); context.fillStyle = "white"; context.fill(); context.stroke();
+/*mouth*/
+context.lineWidth="4"; context.strokeStyle = "black";
+context.beginPath(); context.moveTo(hx-40, hy+25); context.lineTo(hx-75, hy+25); context.stroke();
+context.rotate(-60 * Math.PI / 180);
+   }
+  
+  frame9 = function() {
+/*humpty frame 9*/
+    /*body*/
+
+var hx = 132;
+var hy = -600;
+
+context.rotate(90 * Math.PI / 180);
+
+context.lineWidth="4"; context.strokeStyle = "black"; context.scale(0.85, 1); context.beginPath(); context.arc(hx, hy, 90, 0, 2 * Math.PI); context.fillStyle = "yellow"; context.fill(); context.stroke();
+  /* legs*/
+context.beginPath(); context.moveTo(hx-50, hy+73); context.lineTo(hx-110, hy+100); context.lineTo(hx-120, hy+135); context.stroke();
+context.beginPath(); context.moveTo(hx+50, hy+73); context.lineTo(hx+80, hy+120); context.lineTo(hx+55, hy+150); context.stroke();
+
+context.lineWidth="3"; context.strokeStyle = "black"; context.scale(0.75, 1); context.beginPath(); context.arc(hx-115, hy+145, 15, 0, 2 * Math.PI); context.fillStyle = "yellow";context.fill();context.stroke();
+context.lineWidth="3"; context.strokeStyle = "black"; context.scale(1, 1); context.beginPath(); context.arc(hx+120, hy+162, 15, 0, 2 * Math.PI); context.fillStyle = "yellow"; context.fill(); context.stroke();
+  
+  /*eyes*/
+context.lineWidth="2"; context.strokeStyle = "black"; context.scale(1.5, 1); context.beginPath(); context.arc(hx-80, hy-30, 6, 0, 2 * Math.PI); context.fillStyle = "black"; context.fill(); context.stroke();
+context.lineWidth="2"; context.strokeStyle = "white"; context.scale(1, 1); context.beginPath(); context.arc(hx-78, hy-32, 1, 0, 2 * Math.PI); context.fillStyle = "white"; context.fill(); context.stroke();
+
+context.lineWidth="2"; context.strokeStyle = "black"; context.scale(1, 1); context.beginPath(); context.arc(hx-30, hy-30, 6, 0, 2 * Math.PI); context.fillStyle = "black"; context.fill(); context.stroke();
+context.lineWidth="2"; context.strokeStyle = "white"; context.scale(1, 1); context.beginPath(); context.arc(hx-28, hy-32, 1, 0, 2 * Math.PI); context.fillStyle = "white"; context.fill(); context.stroke();
+/*mouth*/
+context.lineWidth="4"; context.strokeStyle = "black";
+context.beginPath(); context.moveTo(hx-40, hy+25); context.lineTo(hx-75, hy+25); context.stroke();
+context.rotate(-90 * Math.PI / 180);
+
+   }
+  
+  frame10 = function() {
+/*humpty frame 10*/
+    /*body*/
+
+var hx = -670;
+var hy = -500;
+
+context.rotate(160 * Math.PI / 180);
+
+context.lineWidth="4"; context.strokeStyle = "brown"; context.scale(0.85, 1); context.beginPath(); context.arc(hx, hy, 90, 0, 2 * Math.PI); context.fillStyle = "#ffbf00"; context.fill(); context.stroke();
+  /* legs*/
+context.beginPath(); context.moveTo(hx-50, hy+73); context.lineTo(hx-110, hy+100); context.lineTo(hx-120, hy+135); context.stroke();
+context.beginPath(); context.moveTo(hx+50, hy+73); context.lineTo(hx+10, hy+120); context.lineTo(hx+55, hy+150); context.stroke();
+
+context.lineWidth="3"; context.strokeStyle = "black"; context.scale(0.75, 1); context.beginPath(); context.arc(hx-380, hy+145, 15, 0, 2 * Math.PI); context.fillStyle = "yellow";context.fill();context.stroke();
+context.lineWidth="3"; context.strokeStyle = "black"; context.scale(1, 1); context.beginPath(); context.arc(hx-140, hy+162, 15, 0, 2 * Math.PI); context.fillStyle = "yellow"; context.fill(); context.stroke();
+  
+  /*eyes*/
+context.lineWidth="2"; context.strokeStyle = "black"; context.scale(1.5, 1); context.beginPath(); context.arc(hx+20, hy-30, 6, 0, 2 * Math.PI); context.fillStyle = "black"; context.fill(); context.stroke();
+context.lineWidth="2"; context.strokeStyle = "white"; context.scale(1, 1); context.beginPath(); context.arc(hx+18, hy-32, 1, 0, 2 * Math.PI); context.fillStyle = "white"; context.fill(); context.stroke();
+
+context.lineWidth="2"; context.strokeStyle = "black"; context.scale(1, 1); context.beginPath(); context.arc(hx+78, hy-30, 6, 0, 2 * Math.PI); context.fillStyle = "black"; context.fill(); context.stroke();
+context.lineWidth="2"; context.strokeStyle = "white"; context.scale(1, 1); context.beginPath(); context.arc(hx+80, hy-32, 1, 0, 2 * Math.PI); context.fillStyle = "white"; context.fill(); context.stroke();
+
+ /*mouth*/
+context.lineWidth="4"; context.strokeStyle = "black";
+context.beginPath(); context.moveTo(hx+10, hy+25); context.lineTo(hx+30, hy+15); context.lineTo(hx+45, hy+25); context.lineTo(hx+60, hy+15); context.lineTo(hx+85, hy+25); context.lineTo(hx+90, hy+15);context.lineTo(hx+105, hy+25); context.lineTo(hx+120, hy+15);context.stroke();
+
+/*bang*/
+context.lineWidth="4"; context.strokeStyle = "red";
+context.beginPath(); context.moveTo(hx+90, hy-85); context.lineTo(hx+55, hy-64); context.lineTo(hx+100, hy-24); context.lineTo(hx+130, hy+24);  context.stroke();
+context.beginPath(); context.moveTo(hx+90, hy-85); context.lineTo(hx+105, hy-64); context.lineTo(hx+40, hy-34); context.lineTo(hx+90, hy+3);  context.stroke();
+
+  
+context.rotate(-160 * Math.PI / 180);
+   }
+  
+
+drawArray = [frame10, frame9, frame8, frame7,  frame6,  frame5, frame4, frame3, frame2, frame1]; 
+
+
+  // OnClick Function
+  check = function () {
+    list.onclick = function () {
+      var geuss = (this.innerHTML);
+      this.setAttribute("class", "active");
+      this.onclick = null;
+      for (var i = 0; i < word.length; i++) {
+        if (word[i] === geuss) {
+          geusses[i].innerHTML = geuss;
+          counter += 1;
+        } 
+      }
+      var j = (word.indexOf(geuss));
+      if (j === -1) {
+        lives -= 1;
+        comments();
+        animate();
+      } else {
+        comments();
+      }
+    }
+  }
+  
+    
+  // Play
+  play = function () {
+    categories = [
+        ["apple", "banana", "pear", "kiwi", "grape", "orange", "mango"],
+        ["pen", "pencil", "notebook", "eraser", "paper", "stapler", "marker"],
+        ["dog", "cat", "parrot", "fish", "turtle", "hamster", "snake"]
+
+    ];
+
+    chosenCategory = categories[Math.floor(Math.random() * categories.length)];
+    word = chosenCategory[Math.floor(Math.random() * chosenCategory.length)];
+    word = word.replace(/\s/g, "-");
+    console.log(word);
+    buttons();
+
+    geusses = [ ];
+    lives = 10;
+    counter = 0;
+    space = 0;
+    result();
+    comments();
+    selectCat();
+    canvas();
+  }
+
+  play();
+  
+  // Hints
+hint.onclick = function() {
+      hints = [
+        ["Keeps the doctor away", "Monkey business", "Rhymes with  pair", "New Zealand", "Vineyard, can be green or purple", "Vitamin C", "Opposite of 'Woman, come'"],
+        ["Not a pencil?", "Not a pen?", "Made from paper", "Used for correction", "Made from trees", "Holds paper together", "Writes in colour"],
+
+        ["Mans best friend", "Always land on feet", "Talkative bird", "Can breathe underwater", "Carries its home", "Not exactly Guinea pig", "No legs on this one!"]
+    ];
+
+    var catagoryIndex = categories.indexOf(chosenCategory);
+    var hintIndex = chosenCategory.indexOf(word);
+    showClue.innerHTML = "Hint: " +  hints [catagoryIndex][hintIndex];
+  };
+
+   // Reset
+  document.getElementById('reset').onclick = function() {
+    correct.parentNode.removeChild(correct);
+    letters.parentNode.removeChild(letters);
+    showClue.innerHTML = "Hint: ";
+    context.clearRect(0, 0, 0, 0);
+    play();
+  }
+}
+window.onload = game;
+</script>
+
+</body>
+
+
+
+
+
+
+</html>

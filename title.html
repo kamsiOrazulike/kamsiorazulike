@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+<title>Humpty Falls</title>
+
+	<style> body {background-color:  #1D8ECE ;}</style>
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+<script src="https://kit.fontawesome.com/a076d05399.js"></script>
+
+<style type="text/css">
+  html {
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  border: 0;
+  overflow: hidden; 
+  display: block;
+}
+
+.bg {
+  /* The image used */
+  background-image: url("humptyDumpty.png");
+
+  /* Full height */
+  height: 100%; 
+
+  /* Center and scale the image nicely */
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: cover;
+     opacity: 0.3;
+}
+
+#muteButton{
+  position:fixed;
+  color:white;
+  top:15px;
+  right:20px;
+} #muteButton:hover{
+  transform: scale(1.1);
+}
+
+#playButton{
+  position:fixed;
+  color:white;
+  top:15px;
+  right:90px;
+} #playButton:hover{
+  transform: scale(1.1);
+}
+
+/*Title options*/
+/*Start game*/
+#easyGame{
+text-align:center;
+vertical-align: middle;
+line-height:20px;
+position: absolute;
+bottom: 250px;
+left: 16px;
+color: white;
+background: #10da00;
+}
+
+#mediumGame{
+text-align:center;
+vertical-align: middle;
+line-height:20px;
+position: absolute;
+bottom: 150px;
+left: 16px;
+color: white;
+background: #ffc900;
+}
+
+#hardGame{
+text-align:center;
+vertical-align: middle;
+line-height:20px;
+position: absolute;
+bottom: 50px;
+left: 16px;
+color: white;
+background: #bf0000;
+}
+
+/*HOVER CLASS*/
+.mouse {
+  width: 200px;
+  height: 20px;
+  -webkit-transition: width 1s; 
+  transition: width 1s;
+}
+.mouse:hover {
+  width: 350px;
+}
+
+.font {
+font-size: 30px;
+}
+
+/*Settings
+#setUp{
+text-align:center;
+vertical-align: middle;
+line-height:75px;
+  position: absolute;
+  bottom: 150px;
+  left: 16px;
+color: white;
+} */
+
+#howToPlay{
+  text-align:center;
+  color:white;
+  font-size: 26px;
+  position: absolute;
+  top: 300px;
+  right: 80px;
+  width: 50%;
+  height: 50%;
+  border: 4px solid #80C6FF;
+border-image:   linear-gradient(to right, #FFC300 25%,  #FF5733 25%, #FF5733 50%, #C70039 50%, red 75%, #581845 75%) 5;
+transition: all .7s ease-in-out;
+}
+
+#howToPlay:hover {
+ transform: scale(1.1); 
+ border-image:   linear-gradient(to right, #581845 25%, #C70039 25%, #C70039 50%, #FF5733 50%, #FF5733 75%, #FFC300 75%) 5;
+}
+
+body {
+background-color: #1D8EFF;
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  border: 0;
+  position: top;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: block;
+  overflow: hidden;
+  -webkit-font-smoothing: antialiased;
+}
+
+
+/* Bouncing letters animation */
+h1 {
+  cursor: default;
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  width: 100%;
+  height: 700px;
+  margin: auto;
+  display: block;
+  text-align: center;
+}
+
+h1 span {
+  position: relative;
+  top: 20px;
+  display: inline-block;
+  -webkit-animation: bounce 0.3s ease infinite alternate;
+ -webkit-text-stroke: 1px black;
+  font-size: 100px;
+  color: #FFFFFF;
+}
+
+h1 span:nth-child(2) {
+  -webkit-animation-delay: 0.1s;
+}
+
+h1 span:nth-child(3) {
+  -webkit-animation-delay: 0.2s;
+}
+
+h1 span:nth-child(4) {
+  -webkit-animation-delay: 0.3s;
+}
+
+h1 span:nth-child(5) {
+  -webkit-animation-delay: 0.4s;
+}
+
+h1 span:nth-child(6) {
+  -webkit-animation-delay: 0.5s;
+}
+
+h1 span:nth-child(7) {
+  -webkit-animation-delay: 0.6s;
+}
+
+h1 span:nth-child(8) {
+  -webkit-animation-delay: 0.2s;
+}
+
+h1 span:nth-child(9) {
+  -webkit-animation-delay: 0.3s;
+}
+
+h1 span:nth-child(10) {
+  -webkit-animation-delay: 0.4s;
+}
+
+h1 span:nth-child(11) {
+  -webkit-animation-delay: 0.5s;
+}
+
+h1 span:nth-child(12) {
+  -webkit-animation-delay: 0.6s;
+}
+
+/* animation */
+@-webkit-keyframes bounce {
+  100% {
+    top: -20px;}
+}
+</style>
+</head>
+
+
+<body>
+<audio id="humptyMusic" autoplay="" loop>
+<source src="humptyMusic.mp3" type="audio/mpeg">
+</audio>
+
+<h1 id = "gameTitle">
+  <span>H</span>
+  <span>U</span>
+  <span>M</span>
+  <span>P</span>
+  <span>T</span>
+  <span>Y</span>
+<br>
+  <span>F</span>
+  <span>A</span>
+  <span>L</span>
+  <span>L</span>
+  <span>S</span>
+</h1>
+
+<div class="bg"></div>
+
+<i id = "muteButton" class="fas fa-volume-mute" style='font-size:50px' class='far'></i>
+<i id = "playButton" class="fas fa-volume-up" style='font-size:50px' class='far'></i>
+
+
+<div id = "easyGame">
+<p class = "mouse font"> Very easy </p>
+</div>
+<div id = "mediumGame">
+<p class = "mouse font"> A litte not easy </p>
+</div>
+<div id = "hardGame">
+<p class = "mouse font"> Very not easy </p>
+</div>
+
+
+<p id="howToPlay">
+ <u><b>How to Play Humpty Hangman:</b></u><br>
+
+1.  Determine the desired difficulty level quickly <br>
+2.  Begin guessing letters by clicking on them using the mouse wisely<br>
+3.  If the letter is within the word then Humpty remains sitting on the wall peacefully<br>
+4.  If the letter does not belong in the word Humpty will lose balance gradually<br>
+5.  Only when struggling, use a hint cautiously<br>
+6.  10 incorrect answers will cause the great fall, horrifically <br>
+7.  The next word appears and the same applies to it, obviously<br>
+
+</p>
+
+<script type="text/javascript">
+var music = document.getElementById('humptyMusic'); 
+document.getElementById("muteButton").addEventListener("click", clickToMute);
+function clickToMute(){
+    music.muted = true;
+}
+document.getElementById("playButton").addEventListener("click", clickToPlay);
+function clickToPlay(){
+    music.muted = false;
+}
+
+//onto Game page
+document.getElementById("easyGame").addEventListener("click",clickToEasy);
+function clickToEasy(){
+	window.open("humptyFalls.html", "_self");
+	}
+
+document.getElementById("mediumGame").addEventListener("click",clickToMedium);
+function clickToMedium(){
+  window.open("humptyMedium.html", "_self");
+  }
+
+document.getElementById("hardGame").addEventListener("click",clickToHard);
+function clickToHard(){
+  window.open("humptyDiff.html", "_self");
+  }
+
+
+
+</script>
+
+
+</body>
+
+
+</html>
